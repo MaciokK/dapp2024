@@ -1,19 +1,24 @@
 package hotel;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BookingManager {
+public class BookingManager extends UnicastRemoteObject implements BookingManagerInterface {
 
 	private Room[] rooms;
 
-	public BookingManager() {
+	// Constructor
+	public BookingManager() throws RemoteException {
+		super(); // Call to UnicastRemoteObject constructor
 		this.rooms = initializeRooms();
 	}
 
-	public Set<Integer> getAllRooms() {
+	@Override
+	public Set<Integer> getAllRooms() throws RemoteException {
 		Set<Integer> allRooms = new HashSet<Integer>();
 		Iterable<Room> roomIterator = Arrays.asList(rooms);
 		for (Room room : roomIterator) {
@@ -22,18 +27,43 @@ public class BookingManager {
 		return allRooms;
 	}
 
-	public boolean isRoomAvailable(Integer roomNumber, LocalDate date) {
-		//implement this method
+	@Override
+	public boolean isRoomAvailable(Integer roomNumber, LocalDate date) throws RemoteException {
+		for (Room room : rooms) {
+			if (room.getRoomNumber().equals(roomNumber)) {
+				return room.isAvailable(date);
+			}
+		}
 		return false;
 	}
 
-	public void addBooking(BookingDetail bookingDetail) {
-		//implement this method
+	@Override
+	public void addBooking(BookingDetail bookingDetail) throws RemoteException {
+		try {
+			for (Room room : rooms) {
+				if (room.getRoomNumber().equals(bookingDetail.getRoomNumber())) {
+					room.addBooking(bookingDetail);
+					return;
+				}
+			}
+			throw new Exception("Room number " + bookingDetail.getRoomNumber() + " does not exist.");
+		}
+		catch (Exception e) {
+			// Wrap and rethrow the exception as RemoteException
+			throw new RemoteException(e.getMessage(), e);
+		}
 	}
 
-	public Set<Integer> getAvailableRooms(LocalDate date) {
-		//implement this method
-		return null;
+
+	@Override
+	public Set<Integer> getAvailableRooms(LocalDate date) throws RemoteException {
+		Set<Integer> availableRooms = new HashSet<Integer>();
+		for (Room room : rooms){
+			if (room.isAvailable(date)){
+				availableRooms.add(room.getRoomNumber());
+			}
+		}
+		return availableRooms;
 	}
 
 	private static Room[] initializeRooms() {

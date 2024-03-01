@@ -1,15 +1,14 @@
 package hotel;
 
 import java.time.LocalDate;
-import java.io.Serializable;
 
-public class BookingDetail implements Serializable {
+public class BookingDetailLocal {
 
 	private String guest;
 	private Integer roomNumber;
 	private LocalDate date;
 
-	public BookingDetail(String guest, Integer roomNumber, LocalDate date) {
+	public BookingDetailLocal(String guest, Integer roomNumber, LocalDate date) {
 		this.guest = guest;
 		this.roomNumber = roomNumber;
 		this.date = date;

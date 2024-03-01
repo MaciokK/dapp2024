@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BookingManager {
+public class BookingManagerLocal {
 
 	private Room[] rooms;
 
-	public BookingManager() {
+	public BookingManagerLocal() {
 		this.rooms = initializeRooms();
 	}
 

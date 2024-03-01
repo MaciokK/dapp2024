@@ -1,9 +1,10 @@
+package hotel;
+
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.RemoteException;
-import hotel.BookingManager;
 
 public class ServerSetup {
     public static void main(String[] args) {
@@ -15,7 +16,7 @@ public class ServerSetup {
             System.out.println("RMI Registry started on port 1099");
             // Proceed to bind your remote objects here
             // Bind the remote object's stub in the registry under the name "BookingManager"
-            Naming.rebind("BookingManager", bookingManager);
+            Naming.rebind("rmi://localhost/BookingManager", bookingManager);
             System.out.println("BookingManager is bound in the RMI registry");
 
 

@@ -7,7 +7,7 @@ import java.util.Set;
 import hotel.BookingDetail;
 import hotel.BookingManager;
 
-public class BookingClient extends AbstractScriptedSimpleTest {
+public class BookingClientLocal extends AbstractScriptedSimpleTest {
 
 	private BookingManager bm = null;
 
@@ -19,7 +19,7 @@ public class BookingClient extends AbstractScriptedSimpleTest {
 	/***************
 	 * CONSTRUCTOR *
 	 ***************/
-	public BookingClient() {
+	public BookingClientLocal() {
 		try {
 			//Look up the registered remote instance
 			bm = new BookingManager();
