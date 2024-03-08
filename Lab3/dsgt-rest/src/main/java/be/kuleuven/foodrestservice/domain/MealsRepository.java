@@ -54,4 +54,15 @@ public class MealsRepository {
     public Collection<Meal> getAllMeal() {
         return meals.values();
     }
+
+    public Optional<Meal> findCheapestMeal() {
+        return meals.values().stream()
+                .min(Comparator.comparingDouble(Meal::getPrice));
+    }
+
+    public Optional<Meal> findBiggestMeal() {
+        return meals.values().stream()
+                .max(Comparator.comparingDouble(Meal::getKcal));
+    }
+
 }
