@@ -1,5 +1,6 @@
 package be.kuleuven.foodrestservice.domain;
 
+import be.kuleuven.foodrestservice.exceptions.MealNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -65,4 +66,27 @@ public class MealsRepository {
                 .max(Comparator.comparingDouble(Meal::getKcal));
     }
 
+    public void addMeal(Meal meal) {
+        Assert.notNull(meal.getId(), "The meal ID must not be null");
+        Assert.notNull(meal.getName(), "The meal name must not be null");
+        Assert.notNull(meal.getKcal(), "The meal kcal must not be null");
+        Assert.notNull(meal.getPrice(), "The meal price must not be null");
+        Assert.notNull(meal.getDescription(), "The meal description must not be null");
+        Assert.notNull(meal.getMealType(), "The meal type must not be null");
+
+        meals.put(meal.getId(), meal);
+    }
+
+    public void saveMeal(Meal meal) {
+        Assert.notNull(meal.getId(), "The meal ID must not be null");
+        // Additional validation can be added as necessary
+        meals.put(meal.getId(), meal);
+    }
+
+    public void deleteMeal(String id) {
+        if (!meals.containsKey(id)) {
+            throw new MealNotFoundException(id);
+        }
+        meals.remove(id);
+    }
 }

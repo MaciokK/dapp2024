@@ -1,2 +1,1 @@
-curl -X POST localhost:8080/rest/meals -H 'Content-type:application/json' -d @new-meal.json -v
-
+curl -X POST localhost:8080/rest/meals -H 'Content-type:application/json' -d @/home/maciej/Documents/dapp2024/dapp2024/Lab3/dsgt-rest/src/main/resources/requests/new-meal.json -v

@@ -6,8 +6,11 @@ import be.kuleuven.foodrestservice.exceptions.MealNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -64,36 +67,63 @@ public class MealsRestController {
                 linkTo(methodOn(MealsRestController.class).getMeals()).withRel("meals"));
     }
 
-    /*@GetMapping("/rest/meals")
-    CollectionModel<EntityModel<Meal>> addMeal() {
-        Collection<Meal> meals = mealsRepository.getAllMeal();
-
-        List<EntityModel<Meal>> mealEntityModels = new ArrayList<>();
-        for (Meal m : meals) {
-            EntityModel<Meal> em = mealToEntityModel(m.getId(), m);
-            mealEntityModels.add(em);
-        }
-        return CollectionModel.of(mealEntityModels,
-                linkTo(methodOn(MealsRestController.class).addMeal()).withSelfRel());
-    }
-
     @PostMapping("/rest/meals")
-    ResponseEntity<Meal> createMeal(@RequestBody Meal meal) {
-        // Logic to add meal to repository
-        // Return 201 Created status and include the meal in the body, typically with a Location header as well
+    public ResponseEntity<?> createMeal(@RequestBody Meal newMeal) {
+        // Generate a new UUID for the meal and set it
+        newMeal.setId(UUID.randomUUID().toString());
+
+        // Save the new meal in the repository
+        mealsRepository.addMeal(newMeal);
+
+        // Build the location of the newly created meal
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newMeal.getId())
+                .toUri();
+
+        // Return the response entity with the 201 status code and the location header
+        return ResponseEntity.created(location).body(newMeal);
     }
 
     @PutMapping("/rest/meals/{id}")
-    ResponseEntity<Meal> updateMeal(@PathVariable String id, @RequestBody Meal meal) {
-        // Logic to update the meal in the repository
-        // Return 200 OK status and include the updated meal in the body
+    public ResponseEntity<?> updateMeal(@PathVariable String id, @RequestBody Meal mealUpdate) {
+        Meal existingMeal = mealsRepository.findMeal(id)
+                .orElseThrow(() -> new MealNotFoundException(id));
+
+        // Update the existing meal's properties with the ones from mealUpdate
+        existingMeal.setName(mealUpdate.getName());
+        existingMeal.setDescription(mealUpdate.getDescription());
+        existingMeal.setMealType(mealUpdate.getMealType());
+        existingMeal.setKcal(mealUpdate.getKcal());
+        existingMeal.setPrice(mealUpdate.getPrice());
+
+        // Assume you have a method in MealsRepository to save the updated meal
+        mealsRepository.saveMeal(existingMeal);
+
+        // Build the location URI
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .buildAndExpand(existingMeal.getId())
+                .toUri();
+
+        // Return the response entity with 200 OK status and the updated meal
+        return ResponseEntity.ok()
+                .location(location)
+                .body(existingMeal);
     }
 
     @DeleteMapping("/rest/meals/{id}")
-    ResponseEntity<?> deleteMeal(@PathVariable String id) {
-        // Logic to remove the meal from the repository
-        // Return 204 No Content status if successful
-    }*/
+    public ResponseEntity<?> deleteMeal(@PathVariable String id) {
+        Meal meal = mealsRepository.findMeal(id)
+                .orElseThrow(() -> new MealNotFoundException(id));
+
+        // Remove the meal from the repository
+        mealsRepository.deleteMeal(id);
+
+        // Return a 204 No Content response to indicate the deletion was successful
+        return ResponseEntity.noContent().build();
+    }
 
     private EntityModel<Meal> mealToEntityModel(String id, Meal meal) {
         return EntityModel.of(meal,
